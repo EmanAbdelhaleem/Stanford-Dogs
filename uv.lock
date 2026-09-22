@@ -3,6 +3,6 @@ revision = 3
 requires-python = ">=3.12"
 
 [[package]]
-name = "standford-dogs"
+name = "stanford-dogs"
 version = "0.1.0"
 source = { editable = "." }

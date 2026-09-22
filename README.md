@@ -1,1 +1,1 @@
-# Standford-Dogs
+# Stanford-Dogs

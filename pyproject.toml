@@ -1,5 +1,5 @@
 [project]
-name = "standford-dogs"
+name = "stanford-dogs"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -10,7 +10,7 @@ requires-python = ">=3.12"
 dependencies = []
 
 [project.scripts]
-standford-dogs = "standford_dogs:main"
+stanford-dogs = "stanford_dogs:main"
 
 [build-system]
 requires = ["uv_build>=0.12.10,<0.13.0"]
