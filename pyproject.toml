@@ -7,7 +7,10 @@ authors = [
     { name = "Eman Abdelhaleem", email = "emanabdelhaleem4@gmail.com" }
 ]
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "torch>=2.14.0",
+    "torchvision>=0.29.0",
+]
 
 [project.scripts]
 stanford-dogs = "stanford_dogs:main"
@@ -15,3 +18,8 @@ stanford-dogs = "stanford_dogs:main"
 [build-system]
 requires = ["uv_build>=0.12.10,<0.13.0"]
 build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "kaggle>=2.2.4",
+]
