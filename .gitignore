@@ -217,5 +217,6 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-# Ignore local raw and processed data
+# Ignore local raw and processed data, models
 data/
+checkpoints/
