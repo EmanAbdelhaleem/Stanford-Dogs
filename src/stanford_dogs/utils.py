@@ -1,12 +1,9 @@
-from pathlib import Path
 import os
 import random
 import numpy as np
 import torch
-import torch.nn as nn
-from stanford_dogs.config import SEED
 
-def seed_everything(seed: int = SEED) -> None:
+def seed_everything(seed: int) -> None:
     """
     Sets random seeds across Python, NumPy, PyTorch, and CUDA
     to ensure full experiment reproducibility.

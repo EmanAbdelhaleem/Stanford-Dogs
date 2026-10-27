@@ -1,7 +1,6 @@
 from torchvision import transforms
-from stanford_dogs.config import IMG_SIZE
 
-def get_transforms(img_size: int=IMG_SIZE):
+def get_transforms(img_size: int):
 
     train_transform = transforms.Compose([
         transforms.RandomResizedCrop(

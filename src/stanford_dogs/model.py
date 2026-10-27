@@ -1,10 +1,8 @@
 import torch
 import torchvision.models as models
 import torch.nn as nn
-from stanford_dogs.config import NUM_CLASSES
-
 class DogBreedClassifier(nn.Module):
-    def __init__(self, num_classes = NUM_CLASSES):
+    def __init__(self, num_classes):
         super().__init__()
 
         resnet50 = models.resnet50(weights=models.ResNet50_Weights.DEFAULT)
@@ -26,5 +24,5 @@ class DogBreedClassifier(nn.Module):
         return x
 
 
-def build_model(num_classes: int= NUM_CLASSES):
+def build_model(num_classes: int):
     return DogBreedClassifier(num_classes= num_classes)

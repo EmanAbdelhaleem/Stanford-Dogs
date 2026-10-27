@@ -1,10 +1,11 @@
 import torch
 import torch.nn as nn
+import argparse
 import torch.optim as optim
 from stanford_dogs.model import build_model
 from stanford_dogs.dataset import get_dataloaders
 from stanford_dogs.transforms import get_transforms
-from stanford_dogs.config import EPOCHS, LR, CHECKPOINTS_DIR
+from stanford_dogs.config import EPOCHS, LR, CHECKPOINTS_DIR, DATA_DIR, NUM_WORKERS, BATCH_SIZE, SEED, NUM_CLASSES, IMG_SIZE
 from stanford_dogs.utils import seed_everything
 
 from tqdm import tqdm
@@ -57,30 +58,36 @@ def validate(model, val_loader, criterion, device):
     
     return val_loss, val_acc
 
-def main():
-    seed_everything()
+def main(args: argparse.Namespace):
+    seed_everything(seed= SEED)
 
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     print(f"[INFO] Training on device: {device}")
         
-    train_transform, test_transform = get_transforms()
-    train_loader, val_loader, test_loader = get_dataloaders(train_transform, test_transform)
+    train_transform, test_transform = get_transforms(img_size= IMG_SIZE)
+    train_loader, val_loader, test_loader = get_dataloaders(
+        train_transform, test_transform,
+        batch_size= args.batch_size,
+        num_workers= args.num_workers,
+        seed= SEED,
+        data_dir= DATA_DIR,
+    )
 
-    model = build_model().to(device)
+    model = build_model(num_classes= NUM_CLASSES).to(device)
     optimizer = optim.AdamW(
         filter(lambda p: p.requires_grad, model.parameters()),
-        lr = LR
+        lr = args.learning_rate,
     )
     criterion = nn.CrossEntropyLoss()
 
-    epochs = EPOCHS
+    epochs = args.n_epochs
     best_val_loss = float("inf")
     best_model_path = CHECKPOINTS_DIR / "best_model.pt"
 
     print(f"[INFO] Starting training for {epochs} epochs...\n")
     start_time = time.time()
 
-    for epoch in range(EPOCHS):
+    for epoch in range(epochs):
         epoch_start = time.time()
         train_loss, train_acc = train_one_epoch(
             model= model, train_loader= train_loader, optimizer=optimizer, criterion=criterion, device=device,
@@ -91,7 +98,7 @@ def main():
         epoch_duration = time.time() - epoch_start
 
         print(
-            f"Epoch [{epoch:02d}/{epochs:02d}] ({epoch_duration:.1f}s) | "
+            f"Epoch [{epoch+1:02d}/{epochs:02d}] ({epoch_duration:.1f}s) | "
             f"Train Loss: {train_loss:.4f} - Train Acc: {train_acc*100:.2f}% | "
             f"Val Loss: {val_loss:.4f} - Val Acc: {val_acc*100:.2f}%"
         )
@@ -124,6 +131,16 @@ def main():
         f"[FINAL TEST RESULT] Loss: {test_loss:.4f} | Accuracy: {test_acc*100:.2f}%\n"
     )
 
+def parse_args():
+    parser = argparse.ArgumentParser(description='Stanford Dogs Classifier')
+    parser.add_argument('--batch_size', help='Batch_size', default=BATCH_SIZE, type=int)
+    parser.add_argument('--n_epochs', help='Number of Epochs', default=EPOCHS, type=int)
+    parser.add_argument('--learning_rate', help='Learning Rate', default=LR, type=float)
+    parser.add_argument('--num_workers', help = 'Number of Workers', default=NUM_WORKERS, type=int)
+    args = parser.parse_args()
+    return args
+
 
 if __name__ == '__main__':
-    main()
+    args = parse_args()
+    main(args= args)

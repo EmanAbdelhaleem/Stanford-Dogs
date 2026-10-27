@@ -1,16 +1,15 @@
 import torch
 from torch.utils.data import DataLoader, random_split, Subset
 from torchvision.datasets import ImageFolder
-from stanford_dogs.config import DATA_DIR, SEED, BATCH_SIZE, NUM_WORKERS
 
 def get_dataloaders(
         train_transform,
         test_transform,
-        data_dir = DATA_DIR,
+        batch_size: int,
+        num_workers: int,
+        seed: int,
+        data_dir,
         val_split: float= 0.1,
-        batch_size: int=BATCH_SIZE,
-        num_workers: int=NUM_WORKERS,
-        seed: int=SEED,
     ):
 
     data = ImageFolder(
