@@ -58,7 +58,10 @@ def validate(model, val_loader, criterion, device):
     
     return val_loss, val_acc
 
-def main(args: argparse.Namespace):
+def main(args: argparse.Namespace | None = None):
+    if args is None:
+        args = parse_args()
+
     seed_everything(seed= SEED)
 
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
@@ -66,7 +69,8 @@ def main(args: argparse.Namespace):
         
     train_transform, test_transform = get_transforms(img_size= IMG_SIZE)
     train_loader, val_loader, test_loader = get_dataloaders(
-        train_transform, test_transform,
+        train_transform= train_transform,
+        test_transform= test_transform,
         batch_size= args.batch_size,
         num_workers= args.num_workers,
         seed= SEED,
@@ -82,6 +86,7 @@ def main(args: argparse.Namespace):
 
     epochs = args.n_epochs
     best_val_loss = float("inf")
+    CHECKPOINTS_DIR.mkdir(parents= True, exist_ok= True)
     best_model_path = CHECKPOINTS_DIR / "best_model.pt"
 
     print(f"[INFO] Starting training for {epochs} epochs...\n")
