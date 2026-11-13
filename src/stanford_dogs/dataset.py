@@ -30,6 +30,7 @@ def get_dataloaders(
     data = ImageFolder(
         root =  data_dir
     )
+    print(data.classes)
 
     val_size = test_size = int(val_split* len(data))
     train_size = len(data) - val_size - test_size
