@@ -5,11 +5,14 @@ import torch.optim as optim
 from stanford_dogs.model import build_model
 from stanford_dogs.dataset import get_dataloaders
 from stanford_dogs.transforms import get_transforms
-from stanford_dogs.config import EPOCHS, LR, CHECKPOINTS_DIR, DATA_DIR, NUM_WORKERS, BATCH_SIZE, SEED, NUM_CLASSES, IMG_SIZE
-from stanford_dogs.utils import seed_everything
+from stanford_dogs.config import EPOCHS, LR, CHECKPOINTS_DIR, LOGS_DIR, DATA_DIR, NUM_WORKERS, BATCH_SIZE, SEED, NUM_CLASSES, IMG_SIZE
+from stanford_dogs.utils import seed_everything, configure_logging
 
 from tqdm import tqdm
 import time
+import logging
+
+logger = logging.getLogger(__name__)
 
 def train_one_epoch(model, train_loader, optimizer, criterion, device):
     model.train()
@@ -65,7 +68,7 @@ def main(args: argparse.Namespace | None = None):
     seed_everything(seed= SEED)
 
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-    print(f"[INFO] Training on device: {device}")
+    logger.info("Training on device: %s", device)
         
     train_transform, test_transform = get_transforms(img_size= IMG_SIZE)
     train_loader, val_loader, test_loader = get_dataloaders(
@@ -89,7 +92,7 @@ def main(args: argparse.Namespace | None = None):
     CHECKPOINTS_DIR.mkdir(parents= True, exist_ok= True)
     best_model_path = CHECKPOINTS_DIR / "best_model.pt"
 
-    print(f"[INFO] Starting training for {epochs} epochs...\n")
+    logger.info("Starting training for %d epochs...", epochs)
     start_time = time.time()
 
     for epoch in range(epochs):
@@ -102,10 +105,9 @@ def main(args: argparse.Namespace | None = None):
         )
         epoch_duration = time.time() - epoch_start
 
-        print(
-            f"Epoch [{epoch+1:02d}/{epochs:02d}] ({epoch_duration:.1f}s) | "
-            f"Train Loss: {train_loss:.4f} - Train Acc: {train_acc*100:.2f}% | "
-            f"Val Loss: {val_loss:.4f} - Val Acc: {val_acc*100:.2f}%"
+        logger.info(
+            "Epoch [%02d/%02d] (%.1fs) | Train Loss: %.4f - Train Acc: %.2f%% | Val Loss: %.4f - Val Acc: %.2f%%",
+            epoch + 1, epochs, epoch_duration, train_loss, train_acc * 100, val_loss, val_acc * 100
         )
 
         # Save best checkpoint
@@ -121,19 +123,20 @@ def main(args: argparse.Namespace | None = None):
                 },
                 best_model_path,
             )
-            print(f"  --> Saved new best checkpoint to {best_model_path}")
+            logger.info("  --> Saved new best checkpoint to %s",best_model_path)
 
     total_time = time.time() - start_time
-    print(f"\n[INFO] Training complete in {total_time/60:.2f} minutes.")
+    logger.info("Training complete in %.2f minutes.", total_time/60)
 
     # 7. Final test set evaluation
-    print("\n[INFO] Evaluating best model on unseen Test Set...")
+    logger.info("Evaluating best model on unseen Test Set...")
     checkpoint = torch.load(best_model_path, map_location=device)
     model.load_state_dict(checkpoint["model_state_dict"])
 
     test_loss, test_acc = validate(model, test_loader, criterion, device)
-    print(
-        f"[FINAL TEST RESULT] Loss: {test_loss:.4f} | Accuracy: {test_acc*100:.2f}%\n"
+    logger.info(
+        "[FINAL TEST RESULT] Loss: %.4f | Accuracy: %.2f%%",
+        test_loss,test_acc*100
     )
 
 def parse_args():
@@ -148,4 +151,5 @@ def parse_args():
 
 if __name__ == '__main__':
     args = parse_args()
+    configure_logging(logfile_path= LOGS_DIR / "train.log")
     main(args= args)

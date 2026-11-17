@@ -8,8 +8,12 @@ from stanford_dogs.config import (
 )
 import torch
 import PIL.Image as Image
+import logging
 from stanford_dogs.transforms import get_transforms
 from stanford_dogs.model import build_model
+from stanford_dogs.utils import configure_logging
+
+logger = logging.getLogger(__name__)
 
 
 def _load_and_transform_img(img_source, transforms):
@@ -21,6 +25,7 @@ def _load_and_transform_img(img_source, transforms):
     return transformed_img.unsqueeze(0)
 
 def _load_model(model_path, device):
+    logger.info("Loading checkpoint from %s onto %s", model_path, device)
     model = build_model(NUM_CLASSES)
     saved_checkpoint = torch.load(model_path, map_location=device)
     model.load_state_dict(saved_checkpoint["model_state_dict"])
@@ -50,6 +55,6 @@ class DogClassifier(ModelBase):
 
 
 if __name__ == '__main__':
-    
+    configure_logging()
     dog_classifier = DogClassifier(model_path=Final_Model_Path)
-    print(dog_classifier.predict(img_source= Test_Example_Path))
+    logger.info('Predicted Breed: %s', dog_classifier.predict(img_source= Test_Example_Path))

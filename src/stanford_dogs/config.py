@@ -6,6 +6,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 # Paths
 DATA_DIR = PROJECT_ROOT / "data" / "processed" / "images" / "Images"
 CHECKPOINTS_DIR = PROJECT_ROOT / "checkpoints"
+LOGS_DIR = PROJECT_ROOT / "logs"
 Final_Model_Path = CHECKPOINTS_DIR / "best_model.pt"
 Test_Example_Path = PROJECT_ROOT / "examples" / "n02091032_1396.jpg"
 

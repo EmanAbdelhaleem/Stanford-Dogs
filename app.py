@@ -4,9 +4,15 @@ from pydantic import BaseModel
 
 from PIL import Image, UnidentifiedImageError
 import io
+import logging
 
 from stanford_dogs.inference import DogClassifier
 from stanford_dogs.config import Final_Model_Path
+from stanford_dogs.utils import configure_logging
+
+configure_logging()
+logger = logging.getLogger(__name__)
+
 
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
 ALLOWED_FORMATS = {"PNG", "JPEG"}
@@ -54,4 +60,5 @@ async def predict(file: UploadFile = File(...)):
 
     
     predicted_class = await run_in_threadpool(model.predict, img_source=image)
+    logger.info("Prediction success for %s: %s", file.filename, predicted_class)
     return {"predicted_class": predicted_class}
