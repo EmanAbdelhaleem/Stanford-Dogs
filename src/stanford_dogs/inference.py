@@ -1,10 +1,11 @@
 from abc import ABC, abstractmethod
 from stanford_dogs.config import (
-    Final_Model_Path,
+    Final_PT_Model_Path,
     Test_Example_Path,
     IMG_SIZE,
     DOG_BREED_CLASSES,
     NUM_CLASSES,
+    ONNX_Model_Path,
 )
 import torch
 import PIL.Image as Image
@@ -12,6 +13,8 @@ import logging
 from stanford_dogs.transforms import get_transforms
 from stanford_dogs.model import build_model
 from stanford_dogs.utils import configure_logging
+import onnxruntime as ort
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -52,9 +55,22 @@ class DogClassifier(ModelBase):
         result = torch.argmax(output, dim=1).item()
         return DOG_BREED_CLASSES[result]
 
+class ONNXDogClassifier(ModelBase):
+    def __init__(self, onnx_model_path):
+        self.session = ort.InferenceSession(str(onnx_model_path), providers=["CPUExecutionProvider"])
+        self.input_name = self.session.get_inputs()[0].name
+        _, self.transforms = get_transforms(img_size=IMG_SIZE)
+    
+    def predict(self, img_source):
+        transformed_img = _load_and_transform_img(img_source= img_source, transforms= self.transforms).cpu().numpy()
+        output = self.session.run(None, {self.input_name: transformed_img})
+        result = np.argmax(output[0], axis=1)[0]
+        return DOG_BREED_CLASSES[result]
 
-
+        
 if __name__ == '__main__':
     configure_logging()
-    dog_classifier = DogClassifier(model_path=Final_Model_Path)
-    logger.info('Predicted Breed: %s', dog_classifier.predict(img_source= Test_Example_Path))
+    dog_classifier = DogClassifier(model_path=Final_PT_Model_Path)
+    onnx_classifier = ONNXDogClassifier(onnx_model_path=ONNX_Model_Path)
+    logger.info('Pytorch Predicted Breed: %s', dog_classifier.predict(img_source= Test_Example_Path))
+    logger.info('ONNX Predicted Breed: %s', onnx_classifier.predict(img_source= Test_Example_Path))

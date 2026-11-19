@@ -7,7 +7,8 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 DATA_DIR = PROJECT_ROOT / "data" / "processed" / "images" / "Images"
 CHECKPOINTS_DIR = PROJECT_ROOT / "checkpoints"
 LOGS_DIR = PROJECT_ROOT / "logs"
-Final_Model_Path = CHECKPOINTS_DIR / "best_model.pt"
+Final_PT_Model_Path = CHECKPOINTS_DIR / "best_model.pt"
+ONNX_Model_Path = CHECKPOINTS_DIR / 'model.onnx'
 Test_Example_Path = PROJECT_ROOT / "examples" / "n02091032_1396.jpg"
 
 # Hyperparameters

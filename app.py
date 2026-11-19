@@ -6,8 +6,8 @@ from PIL import Image, UnidentifiedImageError
 import io
 import logging
 
-from stanford_dogs.inference import DogClassifier
-from stanford_dogs.config import Final_Model_Path
+from stanford_dogs.inference import ONNXDogClassifier
+from stanford_dogs.config import ONNX_Model_Path
 from stanford_dogs.utils import configure_logging
 
 configure_logging()
@@ -18,7 +18,7 @@ MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
 ALLOWED_FORMATS = {"PNG", "JPEG"}
 
 app = FastAPI()
-model = DogClassifier(Final_Model_Path)
+model = ONNXDogClassifier(ONNX_Model_Path)
 
 class PredictResponse(BaseModel):
     predicted_class: str
