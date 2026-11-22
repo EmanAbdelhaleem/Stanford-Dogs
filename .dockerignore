@@ -1,0 +1,25 @@
+__pycache__
+.venv
+*.pyc
+*.pyo
+*.pyd
+.git
+.gitignore
+
+data/
+examples/
+notebooks/
+logs/
+
+.python-version
+pytorch_to_onnx.py
+README.md
+
+# Only the ONNX model is needed in the image
+checkpoints/*
+!checkpoints/model.onnx
+
+# not needed for inference
+src/stanford_dogs/train.py
+src/stanford_dogs/dataset.py
+src/stanford_dogs/crop_bbx.py

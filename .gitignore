@@ -220,3 +220,4 @@ __marimo__/
 # Ignore local raw and processed data, models
 data/
 checkpoints/
+logs/
