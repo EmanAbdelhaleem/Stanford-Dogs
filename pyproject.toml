@@ -1,7 +1,7 @@
 [project]
 name = "stanford-dogs"
 version = "0.1.0"
-description = "Add your description here"
+description = "Fine-grained dog breed classification and serving engine using PyTorch, ONNX Runtime, and FastAPI"
 readme = "README.md"
 authors = [
     { name = "Eman Abdelhaleem", email = "emanabdelhaleem4@gmail.com" }
